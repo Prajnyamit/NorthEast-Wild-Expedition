@@ -52,7 +52,7 @@ export default function Home() {
                         <SectionHeading
                             eyebrow="Featured Destinations"
                             title="Ranges that stay with you."
-                            description="From the rain-shadow deserts of Spiti to the granite horns of Patagonia — regions we know trail by trail, season by season."
+                            description="From the lush valleys of Northeast India to the majestic Himalayan landscapes of Uttarakhand — discover extraordinary destinations, one trail at a time."
                         />
                         <Reveal delay={0.2}>
                             <Link
@@ -66,14 +66,20 @@ export default function Home() {
                         </Reveal>
                     </div>
                     <div className="mt-14 grid grid-cols-12 gap-4">
-                        {destinations.map((d, i) => (
-                            <DestinationCard
-                                key={d.id}
-                                d={d}
-                                className={DEST_LAYOUT[i].className}
-                                h={DEST_LAYOUT[i].h}
-                            />
-                        ))}
+                        
+                        {destinations.map((d, i) => {
+                            const layout = DEST_LAYOUT[i % DEST_LAYOUT.length];
+
+                            return (
+                                <DestinationCard
+                                    key={d.id}
+                                    d={d}
+                                    className={layout.className}
+                                    h={layout.h}
+                                />
+                            );
+                        })}
+
                     </div>
                 </div>
             </section>
@@ -82,9 +88,10 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-5 lg:px-8">
                     <div className="flex flex-wrap items-end justify-between gap-6">
                         <SectionHeading
-                            eyebrow="Adventure Experiences"
-                            title="Choose how you go wild."
-                            description="Seven disciplines, one standard — slow, deliberate and guided by people who have walked it a hundred times."
+                        eyebrow="Culture · Nature · Heritage"
+                        title="Discover the soul of every destination."
+                        description="From vibrant tribal festivals and ancient traditions to extraordinary landscapes and living heritage, explore experiences beyond the trail."
+                           
                         />
                         <Reveal delay={0.2}>
                             <Link
