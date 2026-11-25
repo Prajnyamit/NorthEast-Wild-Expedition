@@ -68,14 +68,14 @@ export default function Home() {
                     <div className="mt-14 grid grid-cols-12 gap-4">
                         
                         {destinations.map((d, i) => {
-                            const layout = DEST_LAYOUT[i % DEST_LAYOUT.length];
+                            const layout = DEST_LAYOUT[i % DEST_LAYOUT.length] || {};
 
                             return (
                                 <DestinationCard
                                     key={d.id}
                                     d={d}
-                                    className={layout.className}
-                                    h={layout.h}
+                                    className={layout.className || ""}
+                                    h={layout.h || ""}
                                 />
                             );
                         })}
