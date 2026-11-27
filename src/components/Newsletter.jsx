@@ -12,10 +12,9 @@ export default function Newsletter() {
             toast.error("Please enter a valid email address");
             return;
         }
-        toast.success("Welcome to the expedition list", {
-            description: "Your first quarterly field journal is on its way.",
+        toast.info("Newsletter signup is not connected yet", {
+            description: "Please contact our team directly for trek updates and departure information.",
         });
-        setEmail("");
     };
 
     return (
@@ -37,8 +36,7 @@ export default function Newsletter() {
                         </Reveal>
                         <Reveal delay={0.16}>
                             <p className="mt-5 max-w-md text-base leading-relaxed text-sage">
-                                New routes, departure windows and dispatches from our guides in
-                                the field — four journals a year, nothing more.
+                                Get in touch for route updates, seasonal guidance and information about upcoming journeys.
                             </p>
                         </Reveal>
                     </div>

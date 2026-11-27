@@ -11,15 +11,15 @@ import { imgSize } from "../lib/img";
 const FIELD_NOTES = [
     {
         stamp: "Principle 01",
-        text: "We plan like mountaineers, not agencies — turnaround times, weather margins and escape routes on every route.",
+        text: "Good planning starts with clear route information, realistic expectations and attention to local conditions.",
     },
     {
         stamp: "Principle 02",
-        text: "The crew who carries your duffel eats the same dinner, from the same kitchen, at the same table.",
+        text: "Local communities, traditions and landscapes are an important part of understanding every destination.",
     },
     {
         stamp: "Principle 03",
-        text: "Every booking funds trail conservation and the village schools along our routes.",
+        text: "We encourage responsible travel: respect local customs, minimise waste and leave natural places undisturbed.",
     },
 ];
 
@@ -28,8 +28,8 @@ export default function About() {
         <>
             <PageHeader
                 eyebrow="About Us"
-                title="Born on the trails of the North East."
-                description="North East Wild Expedition began with a small crew of mountain guides in Gangtok who believed the wild should be shared slowly, safely and with the people who call it home."
+                title="Explore the mountains with a deeper sense of place."
+                description="Northeast Wild Expedition brings together Himalayan trekking routes, remarkable landscapes and cultural experiences. Explore the collection, understand each route and speak with the team before planning your journey."
             />
 
             <section className="bg-canvas py-20" data-testid="about-story">
@@ -59,27 +59,21 @@ export default function About() {
                     <div>
                         <SectionHeading
                             eyebrow="Our Story"
-                            title="A decade and a half of quiet first ascents — of a different kind."
+                            title="A thoughtful approach to every journey."
                         />
                         <Reveal delay={0.18}>
                             <div className="mt-6 flex flex-col gap-4 text-base leading-relaxed text-moss">
                                 <p>
-                                    We started with one borrowed jeep, two guides and a promise:
-                                    show guests the mountains the way locals know them — the
-                                    routes, the monasteries, the weather signs in the clouds.
+                                    The Himalayas are not just a backdrop for adventure. They are living landscapes shaped by mountain communities, local knowledge, changing seasons and extraordinary natural environments.
                                 </p>
                                 <p>
-                                    Today our lead guides chart expeditions across the Himalayas,
-                                    the Alps, the Dolomites, Patagonia and Iceland. The promise
-                                    has not changed. Groups stay small, every itinerary is walked
-                                    before you walk it, and the mountains are left exactly as we
-                                    found them.
+                                    Our collection brings together trek routes and destination-led experiences so travellers can compare places, understand the journey and ask the right questions before making a booking. Route conditions, permits, inclusions and departure details should always be confirmed with the team.
                                 </p>
                             </div>
                         </Reveal>
                         <Reveal delay={0.26}>
                             <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.25em] text-gold-deep">
-                                — The NE Wild Lead Guides
+                                — Northeast Wild Expedition
                             </p>
                         </Reveal>
                     </div>

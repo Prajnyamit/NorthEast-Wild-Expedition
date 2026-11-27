@@ -208,7 +208,7 @@ export default function TrekDetails() {
                         </a>
 
                         <span className="text-sm text-beige/80">
-                            Starting from <strong className="text-xl text-beige">{price}</strong>
+                            {price === "Contact for price" ? <>Pricing: <strong className="text-beige">Available on enquiry</strong></> : <>Starting from <strong className="text-xl text-beige">{price}</strong></>}
                         </span>
                     </div>
                 </div>
@@ -222,6 +222,7 @@ export default function TrekDetails() {
                         { label: "Starting Point", value: startPoint, icon: MapPin },
                         { label: "Difficulty", value: difficulty, icon: Mountain },
                         { label: "Maximum Altitude", value: altitude, icon: ArrowRight },
+                        { label: "Best Season", value: trek.season, icon: CalendarDays },
                     ]
                         .filter((item) => item.value)
                         .map((item) => {
@@ -261,6 +262,11 @@ export default function TrekDetails() {
                             title="Trek itinerary"
                             description="Explore the journey day by day."
                         />
+                        {trek.isDestinationFallback && (
+                            <p className="mb-5 rounded-xl border border-gold/30 bg-white px-5 py-4 text-sm leading-relaxed text-ink/70">
+                                This is an itinerary outline linked to the destination listing. Exact route stages, operating dates, permits, accommodation, inclusions and pricing must be confirmed with our team before booking.
+                            </p>
+                        )}
 
                         <div className="space-y-3">
                             {itinerary.map((day, index) => {

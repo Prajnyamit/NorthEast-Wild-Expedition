@@ -107,10 +107,7 @@ export default function Home() {
                     
                     <div className="mt-14 grid grid-cols-2 auto-rows-[180px] gap-4 md:grid-cols-4 md:auto-rows-[200px]">
                         {experiences.map((e, i) => {
-                            const layout =
-                                i === 0
-                                    ? "col-span-2 row-span-2"
-                                    : "col-span-2 row-span-1";
+                            const layout = BENTO[i % BENTO.length];
 
                             return (
                                 <ExperienceCard
@@ -130,14 +127,19 @@ export default function Home() {
             <section id="adventures" className="bg-canvas py-24" data-testid="featured-adventures">
                 <div className="mx-auto max-w-7xl px-5 lg:px-8">
                     <SectionHeading
-                        eyebrow="Featured Adventures"
-                        title="Expeditions with a departure date."
-                        description="Small-group journeys led by our own guides — every itinerary tested, every detail handled."
+                        eyebrow="Trek Collection"
+                        title="Find a trail that feels like yours."
+                        description="Compare the routes, landscapes and itinerary outlines. Contact our team to confirm current departures, availability and package details."
                     />
                     <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {adventures.map((t, i) => (
+                        {adventures.slice(0, 3).map((t, i) => (
                             <AdventureCard key={t.id} trip={t} delay={(i % 3) * 0.08} />
                         ))}
+                    </div>
+                    <div className="mt-10 text-center">
+                        <Link to="/treks" className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-ink transition hover:border-gold hover:bg-beige">
+                            Explore all treks <ArrowRight className="h-4 w-4" />
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -145,19 +147,18 @@ export default function Home() {
             <WhyUs />
             <InspirationGallery />
 
-            <section className="bg-beige py-24" data-testid="testimonials-section">
-                <div className="mx-auto max-w-7xl px-5 lg:px-8">
-                    <SectionHeading
-                        eyebrow="From the Field Journal"
-                        title="Explorers, in their own words."
-                    />
-                    <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                        {testimonials.map((t, i) => (
-                            <TestimonialCard key={t.id} t={t} delay={(i % 4) * 0.08} />
-                        ))}
+            {testimonials.length > 0 && (
+                <section className="bg-beige py-24" data-testid="testimonials-section">
+                    <div className="mx-auto max-w-7xl px-5 lg:px-8">
+                        <SectionHeading eyebrow="Traveller stories" title="Notes from the trail." description="Experiences shared by travellers who have journeyed with us." />
+                        <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                            {testimonials.map((t, i) => (
+                                <TestimonialCard key={t.id} t={t} delay={(i % 4) * 0.08} />
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             <Newsletter />
         </>

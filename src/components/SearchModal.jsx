@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X } from "lucide-react";
-import { useTrips } from "../context/TripContext";
+import { useNavigate } from "react-router-dom";
 import { useSiteContent } from "../lib/sheets";
 import { imgSize } from "../lib/img";
 import { stopScroll, startScroll } from "../lib/lenis";
 
 export default function SearchModal({ open, onClose }) {
     const [q, setQ] = useState("");
-    const { openTrip } = useTrips();
+    const navigate = useNavigate();
     const { data } = useSiteContent();
 
     const results = useMemo(() => {
-        const list = data.adventures || [];
+        const list = data.treks || [];
         if (!q.trim()) return list.slice(0, 4);
         const needle = q.toLowerCase();
         return list.filter((a) =>
@@ -61,7 +61,7 @@ export default function SearchModal({ open, onClose }) {
                                 autoFocus
                                 value={q}
                                 onChange={(e) => setQ(e.target.value)}
-                                placeholder="Search expeditions, regions, difficulty…"
+                                placeholder="Search treks, destinations or regions…"
                                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink/40"
                                 data-testid="search-modal-input"
                             />
@@ -77,7 +77,7 @@ export default function SearchModal({ open, onClose }) {
                         <div className="max-h-[52vh] overflow-y-auto p-2" data-lenis-prevent>
                             {results.length === 0 ? (
                                 <p className="px-4 py-8 text-center text-sm text-moss">
-                                    No expeditions found — try “Spiti”, “Alps” or “Iceland”.
+                                    No matching treks found. Try a trek name or region.
                                 </p>
                             ) : (
                                 results.map((a) => (
@@ -85,7 +85,7 @@ export default function SearchModal({ open, onClose }) {
                                         key={a.id}
                                         onClick={() => {
                                             onClose();
-                                            openTrip(a);
+                                            navigate(`/treks/${a.id}`);
                                         }}
                                         className="flex w-full items-center gap-4 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-beige"
                                         data-testid={`search-result-${a.id}`}

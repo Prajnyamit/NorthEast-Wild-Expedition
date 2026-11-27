@@ -1,170 +1,70 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { MapPin, Mountain, CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin, Mountain } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { Reveal } from "../components/Reveal";
 import { useSiteContent } from "../lib/sheets";
-import { useTrips } from "../context/TripContext";
 import { imgSize } from "../lib/img";
-
-const DEST_KEY = {
-    spiti: "spiti",
-    dolomites: "dolomites",
-    patagonia: "patagonia",
-    himalayas: "himalayas",
-    iceland: "iceland",
-    alps: "swiss-alps",
-};
 
 const SEASON_TOKENS = {
     "Spring / Summer": ["mar", "apr", "may", "jun", "jul", "aug"],
-    "Autumn": ["sep", "oct", "nov"],
-    "Winter": ["dec", "jan", "feb"],
+    Autumn: ["sep", "oct", "nov"],
+    Winter: ["dec", "jan", "feb"],
 };
 const SEASON_FILTERS = ["All Seasons", ...Object.keys(SEASON_TOKENS)];
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1100&q=80";
 
 export default function Destinations() {
-    const { data } = useSiteContent();
-    const { openTrip } = useTrips();
+    const { data, loading, error } = useSiteContent();
     const [season, setSeason] = useState("All Seasons");
     const destinations = data.destinations || [];
-    const adventures = data.adventures || [];
-
-    const visible = destinations.filter((d) => {
+    const visible = destinations.filter((destination) => {
         if (season === "All Seasons") return true;
         const tokens = SEASON_TOKENS[season] || [];
-        const s = (d.season || "").toLowerCase();
-        return tokens.some((t) => s.includes(t));
+        const value = String(destination.season || "").toLowerCase();
+        return tokens.some((token) => value.includes(token));
     });
-
-    const tripsFor = (destId) =>
-        adventures.filter((a) => {
-            const token = (a.id || "").split("-")[1];
-            return (DEST_KEY[token] || token) === destId;
-        });
 
     return (
         <>
-            <PageHeader
-                eyebrow="Destinations"
-                title="Ranges that change you."
-                description="Six regions, walked and mapped by our own guides. Pick a range — we will handle the passes, permits and pulse checks."
-            />
+            <PageHeader eyebrow="Destinations" title="Find the place that calls you." description="Explore Himalayan valleys, high mountain meadows and remarkable landscapes. Choose a destination to discover its details and related treks." />
             <section className="bg-canvas" data-testid="destinations-page">
                 <div className="mx-auto max-w-7xl px-5 pt-12 lg:px-8">
-                    <Reveal>
-                        <div className="flex flex-wrap gap-2" data-testid="season-filters">
-                            {SEASON_FILTERS.map((s) => (
-                                <button
-                                    key={s}
-                                    onClick={() => setSeason(s)}
-                                    data-testid={`season-pill-${s.toLowerCase().replace(/[\s/]+/g, "-")}`}
-                                    className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition-colors ${
-                                        season === s
-                                            ? "border-gold bg-gold text-charcoal"
-                                            : "border-ink/15 bg-white text-moss hover:border-gold/50"
-                                    }`}
-                                >
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
-                    </Reveal>
+                    <Reveal><div className="flex flex-wrap gap-2" data-testid="season-filters">
+                        {SEASON_FILTERS.map((item) => <button key={item} type="button" onClick={() => setSeason(item)} className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition-colors ${season === item ? "border-gold bg-gold text-charcoal" : "border-ink/15 bg-white text-moss hover:border-gold/50"}`}>{item}</button>)}
+                    </div></Reveal>
                 </div>
-                <div className="mx-auto max-w-7xl px-5 pb-16 pt-6 lg:px-8">
-                    {visible.length === 0 && (
-                        <p className="py-16 text-center text-sm text-moss" data-testid="no-destinations-message">
-                            No regions match this season right now — try another filter.
-                        </p>
-                    )}
+                <div className="mx-auto max-w-7xl px-5 pb-24 pt-10 lg:px-8">
+                    {loading && destinations.length === 0 && <p className="py-12 text-sm text-moss">Loading destinations…</p>}
+                    {error && destinations.length === 0 && <p className="py-12 text-sm text-moss">Destinations could not be loaded. Please try again.</p>}
+                    {!loading && !error && visible.length === 0 && <p className="py-16 text-center text-sm text-moss">No destinations match this season. Try another filter.</p>}
                     <AnimatePresence mode="popLayout">
-                        {visible.map((d, i) => {
-                            const related = tripsFor(d.id);
-                            return (
-                                <motion.div
-                                    layout
-                                    key={d.id}
-                                    initial={{ opacity: 0, y: 24 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -12 }}
-                                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                    className="grid items-center gap-10 border-b border-ink/10 py-14 last:border-0 lg:grid-cols-2 lg:gap-16"
-                                    data-testid={`destination-row-${d.id}`}
-                                >
-                                    <Reveal className={i % 2 ? "md:order-2" : ""}>
-                                        <div className="group relative h-[300px] overflow-hidden rounded-2xl md:h-[440px]">
-                                            <img
-                                                src={imgSize(d.image, 1100)}
-                                                alt={d.name}
-                                                loading="lazy"
-                                                decoding="async"
-                                            className="img-tone h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent" />
-                                        <span className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/30 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-beige backdrop-blur-sm">
-                                            {d.code} · {d.altitude}
-                                        </span>
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {visible.map((destination, index) => <motion.article layout key={destination.id} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, delay: (index % 3) * 0.04 }} className="group overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-sm transition-shadow hover:shadow-xl" data-testid={`destination-card-${destination.id}`}>
+                                <Link
+                                    to={`/treks/${destination.trek_id || destination.trekId || destination.id?.replace(/^D/, "T")}`}
+                                        className="block"
+                                    >
+                                    <div className="relative aspect-[4/3] overflow-hidden bg-forest">
+                                        <img src={destination.image ? imgSize(destination.image, 1000) : FALLBACK_IMAGE} alt={destination.name || "Mountain destination"} loading="lazy" onError={(event) => { event.currentTarget.src = FALLBACK_IMAGE; }} className="img-tone h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-forest/75 via-transparent to-black/10" />
+                                        {destination.code && <span className="absolute left-4 top-4 rounded-full bg-black/35 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-white backdrop-blur">{destination.code}</span>}
+                                        <span className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">{destination.region}</span>
                                     </div>
-                                </Reveal>
-                                <div className={i % 2 ? "md:order-1" : ""}>
-                                    <Reveal>
-                                        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-gold-deep">
-                                            {d.code} — {d.region}
-                                        </p>
-                                        <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-ink md:text-4xl">
-                                            {d.name}
-                                        </h2>
-                                        <p className="mt-4 max-w-lg text-base leading-relaxed text-moss">
-                                            {d.description}
-                                        </p>
-                                        <div className="mt-5 flex flex-wrap gap-2.5">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-beige px-3.5 py-2 text-[11px] font-medium text-pine">
-                                                <Mountain className="h-3.5 w-3.5 text-gold-deep" />
-                                                {d.altitude} max altitude
-                                            </span>
-                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-beige px-3.5 py-2 text-[11px] font-medium text-pine">
-                                                <CalendarDays className="h-3.5 w-3.5 text-gold-deep" />
-                                                {d.season}
-                                            </span>
-                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-beige px-3.5 py-2 text-[11px] font-medium text-pine">
-                                                <MapPin className="h-3.5 w-3.5 text-gold-deep" />
-                                                {d.region}
-                                            </span>
+                                    <div className="p-5 md:p-6">
+                                        <h2 className="font-serif text-2xl text-ink">{destination.name}</h2>
+                                        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-moss">{destination.description}</p>
+                                        <div className="mt-5 flex flex-wrap gap-2 text-[11px] text-moss">
+                                            {destination.altitude && <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 px-3 py-1.5"><Mountain className="h-3.5 w-3.5 text-gold-deep" />{destination.altitude}</span>}
+                                            {destination.season && <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 px-3 py-1.5"><CalendarDays className="h-3.5 w-3.5 text-gold-deep" />{destination.season}</span>}
+                                            {destination.region && <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 px-3 py-1.5"><MapPin className="h-3.5 w-3.5 text-gold-deep" />{destination.region}</span>}
                                         </div>
-                                        {related.length > 0 && (
-                                            <div className="mt-7">
-                                                <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink/50">
-                                                    Expeditions here
-                                                </p>
-                                                <div className="mt-3 flex flex-col gap-2.5">
-                                                    {related.map((t) => (
-                                                        <button
-                                                            key={t.id}
-                                                            onClick={() => openTrip(t)}
-                                                            data-testid={`destination-trip-${t.id}`}
-                                                            className="group flex w-full max-w-md items-center justify-between gap-4 rounded-xl border border-ink/10 bg-white px-4 py-3 text-left transition-colors hover:border-gold/50"
-                                                        >
-                                                            <span className="min-w-0">
-                                                                <span className="block truncate font-serif text-sm font-semibold text-ink">
-                                                                    {t.title}
-                                                                </span>
-                                                                <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-olive">
-                                                                    {t.duration} · {t.price}
-                                                                </span>
-                                                            </span>
-                                                            <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-gold-deep">
-                                                                View →
-                                                            </span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </Reveal>
-                                </div>
-                                </motion.div>
-                            );
-                        })}
+                                        <span className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink">View trek details <ArrowRight className="h-4 w-4 text-gold-deep transition-transform group-hover:translate-x-1" /></span>
+                                    </div>
+                                </Link>
+                            </motion.article>)}
+                        </div>
                     </AnimatePresence>
                 </div>
             </section>

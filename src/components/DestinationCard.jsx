@@ -7,12 +7,6 @@ import { imgSize } from "../lib/img";
 const FALLBACK_IMAGE =
     "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80";
 
-// Maps destination IDs to their corresponding trek IDs
-const DESTINATION_TREK_MAP = {
-    D001: "T001", // Har Ki Dun
-    D002: "T002", // Valley of Flowers
-};
-
 export default function DestinationCard({
     d,
     className = "",
@@ -23,14 +17,8 @@ export default function DestinationCard({
     const image = d.image ? imgSize(d.image, 900) : FALLBACK_IMAGE;
     const meta = [d.code, d.altitude].filter(Boolean).join(" · ");
 
-    const trekId =
-        d.trek_id ||
-        d.trekId ||
-        DESTINATION_TREK_MAP[d.id];
-
-    const destinationLink = trekId
-        ? `/treks/${trekId}`
-        : "/treks";
+    const trekId = d.trek_id || d.trekId || d.id?.replace(/^D/, "T");
+    const destinationLink = trekId ? `/treks/${trekId}` : "/treks";
 
     return (
         <Reveal className={className}>
@@ -77,7 +65,7 @@ export default function DestinationCard({
                     )}
 
                     <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-beige">
-                        Explore Trek
+                        View Trek Details
                         <ArrowRight className="h-3.5 w-3.5 text-gold transition-transform duration-300 group-hover:translate-x-1" />
                     </span>
                 </div>

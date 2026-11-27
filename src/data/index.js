@@ -6,32 +6,32 @@ import { testimonials } from "./testimonials";
 export const MOCK = { destinations, experiences, adventures, testimonials };
 
 export const STATS = [
-    { value: "14+", label: "Years charting the Himalayas" },
-    { value: "4,800m", label: "Average expedition altitude" },
-    { value: "8–12", label: "Explorers per batch, never more" },
-    { value: "99.4%", label: "Summit & safety success rate" },
-    { value: "100%", label: "Zero single-use plastic policy" },
+    { value: "10", label: "Destinations in our current collection" },
+    { value: "Day by day", label: "Itinerary outlines to help you plan" },
+    { value: "On request", label: "Departure and availability details" },
+    { value: "Local", label: "Regional landscapes and culture" },
+    { value: "With care", label: "Thoughtful travel planning" },
 ];
 
 export const WHY_US = [
     {
         icon: "Compass",
         title: "Hand-Curated Routes",
-        text: "Every itinerary is walked, tested and refined by our own guides before it ever carries a traveller.",
+        text: "Explore route outlines and destination information before you enquire about a journey.",
     },
     {
         icon: "MapPinned",
         title: "Local Expert Guides",
-        text: "Certified mountain leaders from the regions we walk — storytellers, naturalists and first-aid professionals.",
+        text: "Ask our team about local guiding arrangements, route conditions and the support available for your chosen trek.",
     },
     {
         icon: "Users",
         title: "Small Groups Only",
-        text: "Eight to twelve explorers per departure, never more. Quiet trails, shared campfires, genuine camaraderie.",
+        text: "Contact us to learn about group size, private departures and the best dates for your chosen route.",
     },
     {
         icon: "Leaf",
         title: "Leave No Trace",
-        text: "Zero single-use plastic, locally sourced provisions and conservation fees built into every booking.",
+        text: "Travel thoughtfully, respect local communities and follow responsible trekking practices on the trail.",
     },
 ];

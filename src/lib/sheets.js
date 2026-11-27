@@ -10,7 +10,7 @@ const SHEET_ID =
         process.env.REACT_APP_SHEET_ID) ||
     SHEET_ID_FALLBACK;
 
-const CACHE_KEY = "mt_sheet_cache_v3";
+const CACHE_KEY = "mt_sheet_cache_v4";
 const CACHE_TTL = 5 * 60 * 1000;
 
 const TABS = {
@@ -175,12 +175,14 @@ function build(raw) {
         "trek_id"
     );
 
+    const dayOrder = (row) => {
+        const value = String(row.day || row.day_number || row.order || "");
+        const match = value.match(/\d+/);
+        return match ? Number(match[0]) : 0;
+    };
+
     const itinerary = groupBy(
-        [...raw.itinerary].sort(
-            (a, b) =>
-                num(a.day || a.day_number || a.order) -
-                num(b.day || b.day_number || b.order)
-        ),
+        [...raw.itinerary].sort((a, b) => dayOrder(a) - dayOrder(b)),
         "trek_id"
     );
 
@@ -190,7 +192,10 @@ function build(raw) {
     const faq = groupBy(raw.faq, "trek_id");
     const documents = groupBy(raw.documents, "trek_id");
 
-    const treks = raw.treks
+    const destinations = raw.destinations.map((d) => ({ ...d, image: img(d.image) }));
+    const heroSourceImage = String(raw.hero[0]?.image || "").trim();
+
+    const sheetTreks = raw.treks
         .filter((t) => t.id)
         .map((t) => {
             const [lat, lng] = (t.coords || "")
@@ -198,10 +203,23 @@ function build(raw) {
                 .map((x) => parseFloat(x));
 
             const id = t.id;
+            const linkedDestination = destinations.find((destination) =>
+                destination.id === (t.destination_id || t.destinationId) ||
+                String(destination.id || "").replace(/^D/i, "T").toUpperCase() === String(t.id).toUpperCase() ||
+                (t.destination_code && destination.code === t.destination_code) ||
+                [t.destination, t.title, t.name].some((value) => {
+                    const a = String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                    const b = String(destination.name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                    return a && b && (a.includes(b) || b.includes(a));
+                })
+            );
+            const suppliedTrekImage = String(t.hero_image || t.image || "").trim();
+            const imageIsHomepageHero = suppliedTrekImage && heroSourceImage && suppliedTrekImage === heroSourceImage;
+            const trekImage = imageIsHomepageHero ? "" : suppliedTrekImage;
 
             return {
                 ...t,
-                image: img(t.image),
+                image: img(trekImage || linkedDestination?.image || ""),
                 group_size: num(t.group_size),
                 rating: num(t.rating),
                 reviews: num(t.reviews),
@@ -240,6 +258,58 @@ function build(raw) {
                 })),
             };
         });
+
+    // Create a basic trek record for each destination that has no matching
+    // Treks-tab row. The destination remains the source for its name, image,
+    // region and editorial description; itinerary data is attached by trek_id.
+    // Commercial fields such as price, difficulty and inclusions are never guessed.
+    const existingTrekIds = new Set(sheetTreks.map((trek) => String(trek.id).toUpperCase()));
+    const destinationTreks = destinations
+        .map((destination) => {
+            const trekId = String(
+                destination.trek_id || destination.trekId ||
+                String(destination.id || "").replace(/^D/i, "T")
+            ).toUpperCase();
+            if (!trekId || existingTrekIds.has(trekId)) return null;
+
+            const trekItinerary = itinerary[trekId] || [];
+            return {
+                id: trekId,
+                destination_id: destination.id,
+                title: destination.name || "Himalayan Trek",
+                name: destination.name || "Himalayan Trek",
+                region: destination.region || "Uttarakhand",
+                location: destination.region || "Uttarakhand",
+                description: destination.description || "Explore this Himalayan destination. Contact us for route and departure information.",
+                image: destination.image || "",
+                altitude: destination.altitude || "",
+                season: destination.season || "",
+                code: destination.code || "",
+                duration: trekItinerary.length ? `${trekItinerary.length} days (itinerary outline)` : "Contact for duration",
+                price: "",
+                difficulty: "",
+                featured: false,
+                itinerary: trekItinerary,
+                gallery: (gallery[trekId] || []).map((g) => ({
+                    ...g,
+                    image: img(g.image),
+                    order: num(g.order),
+                })),
+                inclusions: (inclusions[trekId] || []).map((x) => x.item),
+                exclusions: (exclusions[trekId] || []).map((x) => x.item),
+                reviewList: (reviews[trekId] || []).map((r) => ({
+                    ...r,
+                    rating: num(r.rating),
+                    avatar: img(r.avatar),
+                })),
+                faq: faq[trekId] || [],
+                documents: (documents[trekId] || []).map((d) => ({ ...d, ...pdf(d.url) })),
+                isDestinationFallback: true,
+            };
+        })
+        .filter(Boolean);
+
+    const treks = [...sheetTreks, ...destinationTreks];
 
     // Experience details, indexed by experience ID
     const experienceDetails = Object.fromEntries(
@@ -291,16 +361,15 @@ function build(raw) {
               }
             : null,
 
-        destinations: raw.destinations.map((d) => ({
-            ...d,
-            image: img(d.image),
-        })),
+        destinations,
 
         experiences,
         treks,
 
         // Existing homepage functionality
-        adventures: treks.filter((t) => t.featured),
+        adventures: treks.filter((t) => t.featured).length
+            ? treks.filter((t) => t.featured)
+            : treks.slice(0, 3),
 
         testimonials: raw.testimonials.map((t) => ({
             ...t,
@@ -479,8 +548,9 @@ export function useSiteContent() {
 export function useTrek(id) {
     const { data, loading, error } = useSiteContent();
 
+    const normalizedId = String(id || "").trim().toUpperCase();
     return {
-        trek: data.treks.find((t) => t.id === id) || null,
+        trek: data.treks.find((t) => String(t.id).trim().toUpperCase() === normalizedId) || null,
         loading,
         error,
     };

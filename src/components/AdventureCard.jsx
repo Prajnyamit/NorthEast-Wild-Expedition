@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
     ArrowRight,
     Clock,
@@ -7,7 +8,6 @@ import {
     Mountain,
     Star,
 } from "lucide-react";
-import { useTrips } from "../context/TripContext";
 import { Reveal, EASE } from "./Reveal";
 import { imgSize } from "../lib/img";
 
@@ -15,8 +15,6 @@ const FALLBACK_IMAGE =
     "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=700&q=80";
 
 export default function AdventureCard({ trip, delay = 0 }) {
-    const { openTrip } = useTrips();
-
     if (!trip) return null;
 
     const image = trip.image ? imgSize(trip.image, 700) : FALLBACK_IMAGE;
@@ -103,10 +101,10 @@ export default function AdventureCard({ trip, delay = 0 }) {
                     <div className="mt-auto flex items-center justify-between gap-3 pt-5">
                         <div>
                             <p className="text-[10px] uppercase tracking-[0.2em] text-ink/45">
-                                From
+                                {price === "Contact us" ? "Pricing" : "Starting from"}
                             </p>
                             <p className="font-serif text-xl font-semibold text-ink">
-                                {price}
+                                {price === "Contact us" ? "On enquiry" : price}
                                 {price !== "Contact us" && (
                                     <span className="ml-1 font-sans text-[10px] font-normal text-ink/45">
                                         / person
@@ -115,15 +113,14 @@ export default function AdventureCard({ trip, delay = 0 }) {
                             </p>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => openTrip(trip)}
+                        <Link
+                            to={`/treks/${trip.id}`}
                             data-testid={`explore-trip-button-${trip.id}`}
                             className="group/btn inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-xs font-semibold text-charcoal transition-colors hover:bg-glow"
                         >
                             Explore Trip
                             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </motion.article>
