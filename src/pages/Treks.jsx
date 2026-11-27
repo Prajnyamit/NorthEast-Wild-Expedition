@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { ArrowRight, Search, MessageCircle } from "lucide-react";
 import AdventureCard from "../components/AdventureCard";
 import { SectionHeading } from "../components/Reveal";
@@ -7,10 +6,11 @@ import PageHeader from "../components/PageHeader";
 import { useSiteContent } from "../lib/sheets";
 
 const WHATSAPP_NUMBER = "918822565517";
+const EMPTY_TREKS = [];
 
 export default function Treks() {
     const { data, loading, error } = useSiteContent();
-    const treks = data.treks || [];
+    const treks = data.treks ?? EMPTY_TREKS;
     const [query, setQuery] = useState("");
     const [region, setRegion] = useState("All regions");
 
@@ -29,8 +29,9 @@ export default function Treks() {
         });
     }, [treks, query, region]);
 
-    const enquiryLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Northeast Wild Expedition! Please help me compare the available treks, dates and package details.")}`;
-
+    const enquiryLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+            "Hi Northeast Wild Expedition! Please help me compare the available treks, dates and package details."
+        )}`;
     return (
         <>
             <PageHeader
